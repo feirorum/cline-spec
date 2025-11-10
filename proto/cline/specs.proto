@@ -1,0 +1,381 @@
+syntax = "proto3";
+
+package cline;
+
+import "cline/common.proto";
+
+option go_package = "github.com/cline/grpc-go/cline";
+option java_multiple_files = true;
+option java_package = "bot.cline.proto";
+
+// Service for Progressive Spec feature - spec-driven development with gradual formalization
+service SpecService {
+  // Get all specs with optional filtering
+  rpc getSpecs(GetSpecsRequest) returns (GetSpecsResponse);
+
+  // Get a single spec by ID
+  rpc getSpec(GetSpecRequest) returns (Spec);
+
+  // Add a new spec
+  rpc addSpec(AddSpecRequest) returns (Spec);
+
+  // Update an existing spec
+  rpc updateSpec(UpdateSpecRequest) returns (Spec);
+
+  // Delete a spec
+  rpc deleteSpec(DeleteSpecRequest) returns (Empty);
+
+  // Search specs by query
+  rpc searchSpecs(SearchSpecsRequest) returns (GetSpecsResponse);
+
+  // Extract requirements from conversation
+  rpc extractRequirements(ExtractRequirementsRequest) returns (ExtractRequirementsResponse);
+
+  // Generate spec from requirements (streaming)
+  rpc generateSpec(GenerateSpecRequest) returns (stream GenerateSpecChunk);
+
+  // Generate tests from spec (streaming)
+  rpc generateTests(GenerateTestsRequest) returns (stream GenerateTestsChunk);
+
+  // Detect triggers for spec creation
+  rpc detectTriggers(DetectTriggersRequest) returns (DetectTriggersResponse);
+
+  // Create manual trigger
+  rpc createManualTrigger(CreateManualTriggerRequest) returns (Trigger);
+
+  // Dismiss a trigger
+  rpc dismissTrigger(DismissTriggerRequest) returns (Empty);
+
+  // Get all triggers
+  rpc getTriggers(GetTriggersRequest) returns (GetTriggersResponse);
+
+  // Subscribe to trigger events (streaming)
+  rpc subscribeToTriggers(SubscribeToTriggersRequest) returns (stream TriggerEvent);
+
+  // Get spec settings
+  rpc getSettings(GetSettingsRequest) returns (SpecSettings);
+
+  // Update spec settings
+  rpc updateSettings(UpdateSettingsRequest) returns (Empty);
+
+  // Get spec statistics
+  rpc getStats(GetStatsRequest) returns (SpecStats);
+
+  // Export specs as JSON
+  rpc exportSpecs(ExportSpecsRequest) returns (String);
+
+  // Import specs from JSON
+  rpc importSpecs(ImportSpecsRequest) returns (Int64);
+}
+
+// ============================================================================
+// Core Types
+// ============================================================================
+
+// A specification document
+message Spec {
+  string id = 1;
+  string title = 2;
+  string content = 3;
+  string format = 4;  // "gherkin" | "user-story" | "acceptance-criteria" | "free-form"
+  string status = 5;  // "draft" | "active" | "archived" | "implemented"
+  repeated string files = 6;
+  repeated TestInfo tests = 7;
+  repeated string tags = 8;
+  SpecMetadata metadata = 9;
+}
+
+// Metadata about a spec
+message SpecMetadata {
+  int64 created_at = 1;
+  int64 updated_at = 2;
+  string created_by = 3;  // "user" | "ai"
+  optional string source = 4;
+  int32 version = 5;
+}
+
+// Test information
+message TestInfo {
+  string file_path = 1;
+  string framework = 2;  // "jest" | "vitest" | "mocha" | "pytest" | "go" | "junit"
+  string status = 3;     // "passing" | "failing" | "not-run"
+  optional int64 last_run = 4;
+}
+
+// A requirement extracted from conversation
+message Requirement {
+  string id = 1;
+  string text = 2;
+  string source = 3;  // "conversation" | "user" | "extracted"
+  optional string message_id = 4;
+  double confidence = 5;
+  repeated string files = 6;
+}
+
+// A trigger suggesting spec formalization
+message Trigger {
+  string id = 1;
+  string type = 2;      // "complexity" | "frequency" | "keywords" | "contradiction" | "manual"
+  string severity = 3;  // "info" | "warning" | "error"
+  string message = 4;
+  TriggerContext context = 5;
+  SuggestedAction suggested_action = 6;
+  int64 timestamp = 7;
+  optional bool dismissed = 8;
+}
+
+// Context about what triggered a suggestion
+message TriggerContext {
+  repeated string files = 1;
+  repeated string messages = 2;
+  map<string, double> metrics = 3;
+  optional string task_id = 4;
+}
+
+// Suggested action for a trigger
+message SuggestedAction {
+  string type = 1;        // "extract_spec" | "review_requirements" | "add_tests" | "refactor"
+  string description = 2;
+  optional bool auto_apply = 3;
+}
+
+// Spec settings
+message SpecSettings {
+  bool enabled = 1;
+  bool auto_detect_triggers = 2;
+  TriggerConfig trigger_config = 3;
+  string default_format = 4;
+  string storage_mode = 5;  // "local" | "repo"
+  optional string spec_directory = 6;
+}
+
+// Trigger configuration
+message TriggerConfig {
+  int32 max_lines_per_file = 1;
+  int32 max_cyclomatic_complexity = 2;
+  int32 max_modifications_per_task = 3;
+  repeated string bug_keywords = 4;
+  int32 bug_keyword_threshold = 5;
+  repeated string contradiction_keywords = 6;
+}
+
+// Spec statistics
+message SpecStats {
+  int32 total_specs = 1;
+  map<string, int32> by_status = 2;
+  map<string, int32> by_format = 3;
+  int32 files_with_specs = 4;
+  int32 active_triggers = 5;
+}
+
+// ============================================================================
+// Request/Response Messages
+// ============================================================================
+
+// Get specs request
+message GetSpecsRequest {
+  Metadata metadata = 1;
+  optional string workspace_id = 2;
+  optional SpecFilter filter = 3;
+}
+
+// Spec filter
+message SpecFilter {
+  optional string status = 1;
+  optional string format = 2;
+  optional string file = 3;
+  optional string tag = 4;
+  optional string search = 5;
+}
+
+// Get specs response
+message GetSpecsResponse {
+  repeated Spec specs = 1;
+}
+
+// Get single spec request
+message GetSpecRequest {
+  Metadata metadata = 1;
+  string spec_id = 2;
+}
+
+// Add spec request
+message AddSpecRequest {
+  Metadata metadata = 1;
+  string title = 2;
+  string content = 3;
+  string format = 4;
+  string status = 5;
+  repeated string files = 6;
+  repeated string tags = 7;
+  string created_by = 8;
+  optional string source = 9;
+}
+
+// Update spec request
+message UpdateSpecRequest {
+  Metadata metadata = 1;
+  string spec_id = 2;
+  optional string title = 3;
+  optional string content = 4;
+  optional string format = 5;
+  optional string status = 6;
+  repeated string files = 7;
+  repeated string tags = 8;
+}
+
+// Delete spec request
+message DeleteSpecRequest {
+  Metadata metadata = 1;
+  string spec_id = 2;
+}
+
+// Search specs request
+message SearchSpecsRequest {
+  Metadata metadata = 1;
+  string query = 2;
+}
+
+// Extract requirements request
+message ExtractRequirementsRequest {
+  Metadata metadata = 1;
+  optional string task_id = 2;
+}
+
+// Extract requirements response
+message ExtractRequirementsResponse {
+  repeated Requirement requirements = 1;
+}
+
+// Generate spec request
+message GenerateSpecRequest {
+  Metadata metadata = 1;
+  repeated Requirement requirements = 2;
+  string format = 3;
+  optional GenerationContext context = 4;
+}
+
+// Generation context
+message GenerationContext {
+  repeated ConversationMessage conversation_history = 1;
+  repeated string related_files = 2;
+  repeated string existing_spec_ids = 3;
+}
+
+// Conversation message for generation
+message ConversationMessage {
+  string role = 1;
+  string content = 2;
+}
+
+// Generate spec chunk (streaming)
+message GenerateSpecChunk {
+  string content = 1;
+  bool is_complete = 2;
+}
+
+// Generate tests request
+message GenerateTestsRequest {
+  Metadata metadata = 1;
+  string spec_id = 2;
+}
+
+// Generate tests chunk (streaming)
+message GenerateTestsChunk {
+  string framework = 1;
+  string file_path = 2;
+  string content = 3;
+  string run_command = 4;
+  bool is_complete = 5;
+}
+
+// Detect triggers request
+message DetectTriggersRequest {
+  Metadata metadata = 1;
+  TaskContext task_context = 2;
+}
+
+// Task context for trigger detection
+message TaskContext {
+  string task_id = 1;
+  repeated string modified_files = 2;
+  repeated ConversationMessageWithId conversation = 3;
+  optional string code = 4;
+}
+
+// Conversation message with ID
+message ConversationMessageWithId {
+  string id = 1;
+  string role = 2;
+  string content = 3;
+}
+
+// Detect triggers response
+message DetectTriggersResponse {
+  repeated Trigger triggers = 1;
+}
+
+// Create manual trigger request
+message CreateManualTriggerRequest {
+  Metadata metadata = 1;
+  TaskContext task_context = 2;
+  optional string message = 3;
+}
+
+// Dismiss trigger request
+message DismissTriggerRequest {
+  Metadata metadata = 1;
+  string trigger_id = 2;
+}
+
+// Get triggers request
+message GetTriggersRequest {
+  Metadata metadata = 1;
+  optional string workspace_id = 2;
+}
+
+// Get triggers response
+message GetTriggersResponse {
+  repeated Trigger triggers = 1;
+}
+
+// Subscribe to triggers request
+message SubscribeToTriggersRequest {
+  Metadata metadata = 1;
+}
+
+// Trigger event (streaming)
+message TriggerEvent {
+  Trigger trigger = 1;
+}
+
+// Get settings request
+message GetSettingsRequest {
+  Metadata metadata = 1;
+  optional string workspace_id = 2;
+}
+
+// Update settings request
+message UpdateSettingsRequest {
+  Metadata metadata = 1;
+  SpecSettings settings = 2;
+}
+
+// Get stats request
+message GetStatsRequest {
+  Metadata metadata = 1;
+  optional string workspace_id = 2;
+}
+
+// Export specs request
+message ExportSpecsRequest {
+  Metadata metadata = 1;
+  optional string workspace_id = 2;
+}
+
+// Import specs request
+message ImportSpecsRequest {
+  Metadata metadata = 1;
+  string json_data = 2;
+  optional string workspace_id = 3;
+}
