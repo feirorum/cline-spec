@@ -51,6 +51,8 @@ export interface GlobalState {
 	lastDismissedModelBannerVersion: number
 	lastDismissedCliBannerVersion: number
 	nativeToolCallEnabled: boolean
+	// Progressive Spec feature
+	specs: any | undefined
 }
 
 export interface Settings {
