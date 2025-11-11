@@ -53,6 +53,7 @@ export interface ExtensionStateContextType extends ExtensionState {
 	mcpTab?: McpViewTab
 	showSettings: boolean
 	showHistory: boolean
+	showSpecs: boolean
 	showAccount: boolean
 	showAnnouncement: boolean
 	showChatModelSelector: boolean
@@ -92,12 +93,14 @@ export interface ExtensionStateContextType extends ExtensionState {
 	navigateToMcp: (tab?: McpViewTab) => void
 	navigateToSettings: () => void
 	navigateToHistory: () => void
+	navigateToSpecs: () => void
 	navigateToAccount: () => void
 	navigateToChat: () => void
 
 	// Hide functions
 	hideSettings: () => void
 	hideHistory: () => void
+	hideSpecs: () => void
 	hideAccount: () => void
 	hideAnnouncement: () => void
 	hideChatModelSelector: () => void
@@ -117,6 +120,7 @@ export const ExtensionStateContextProvider: React.FC<{
 	const [mcpTab, setMcpTab] = useState<McpViewTab | undefined>(undefined)
 	const [showSettings, setShowSettings] = useState(false)
 	const [showHistory, setShowHistory] = useState(false)
+	const [showSpecs, setShowSpecs] = useState(false)
 	const [showAccount, setShowAccount] = useState(false)
 	const [showAnnouncement, setShowAnnouncement] = useState(false)
 	const [showChatModelSelector, setShowChatModelSelector] = useState(false)
@@ -130,6 +134,7 @@ export const ExtensionStateContextProvider: React.FC<{
 	// Hide functions
 	const hideSettings = useCallback(() => setShowSettings(false), [setShowSettings])
 	const hideHistory = useCallback(() => setShowHistory(false), [setShowHistory])
+	const hideSpecs = useCallback(() => setShowSpecs(false), [setShowSpecs])
 	const hideAccount = useCallback(() => setShowAccount(false), [setShowAccount])
 	const hideAnnouncement = useCallback(() => setShowAnnouncement(false), [setShowAnnouncement])
 	const hideChatModelSelector = useCallback(() => setShowChatModelSelector(false), [setShowChatModelSelector])
@@ -150,31 +155,43 @@ export const ExtensionStateContextProvider: React.FC<{
 
 	const navigateToSettings = useCallback(() => {
 		setShowHistory(false)
+		setShowSpecs(false)
 		closeMcpView()
 		setShowAccount(false)
 		setShowSettings(true)
-	}, [setShowSettings, setShowHistory, closeMcpView, setShowAccount])
+	}, [setShowSettings, setShowHistory, setShowSpecs, closeMcpView, setShowAccount])
 
 	const navigateToHistory = useCallback(() => {
 		setShowSettings(false)
+		setShowSpecs(false)
 		closeMcpView()
 		setShowAccount(false)
 		setShowHistory(true)
-	}, [setShowSettings, closeMcpView, setShowAccount, setShowHistory])
+	}, [setShowSettings, setShowSpecs, closeMcpView, setShowAccount, setShowHistory])
+
+	const navigateToSpecs = useCallback(() => {
+		setShowSettings(false)
+		setShowHistory(false)
+		closeMcpView()
+		setShowAccount(false)
+		setShowSpecs(true)
+	}, [setShowSettings, setShowHistory, closeMcpView, setShowAccount, setShowSpecs])
 
 	const navigateToAccount = useCallback(() => {
 		setShowSettings(false)
-		closeMcpView()
 		setShowHistory(false)
+		setShowSpecs(false)
+		closeMcpView()
 		setShowAccount(true)
-	}, [setShowSettings, closeMcpView, setShowHistory, setShowAccount])
+	}, [setShowSettings, closeMcpView, setShowHistory, setShowSpecs, setShowAccount])
 
 	const navigateToChat = useCallback(() => {
 		setShowSettings(false)
 		closeMcpView()
 		setShowHistory(false)
+		setShowSpecs(false)
 		setShowAccount(false)
-	}, [setShowSettings, closeMcpView, setShowHistory, setShowAccount])
+	}, [setShowSettings, closeMcpView, setShowHistory, setShowSpecs, setShowAccount])
 
 	const [state, setState] = useState<ExtensionState>({
 		version: "",
@@ -664,6 +681,7 @@ export const ExtensionStateContextProvider: React.FC<{
 		mcpTab,
 		showSettings,
 		showHistory,
+		showSpecs,
 		showAccount,
 		showAnnouncement,
 		showChatModelSelector,
@@ -680,12 +698,14 @@ export const ExtensionStateContextProvider: React.FC<{
 		navigateToMcp,
 		navigateToSettings,
 		navigateToHistory,
+		navigateToSpecs,
 		navigateToAccount,
 		navigateToChat,
 
 		// Hide functions
 		hideSettings,
 		hideHistory,
+		hideSpecs,
 		hideAccount,
 		hideAnnouncement,
 		setShowAnnouncement,

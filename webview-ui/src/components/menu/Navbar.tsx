@@ -1,4 +1,4 @@
-import { HistoryIcon, PlusIcon, SettingsIcon, UserCircleIcon } from "lucide-react"
+import { FileCodeIcon, HistoryIcon, PlusIcon, SettingsIcon, UserCircleIcon } from "lucide-react"
 import { useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
@@ -14,7 +14,8 @@ const McpServerIcon = ({ className, size }: { className?: string; size?: number 
 )
 
 export const Navbar = () => {
-	const { navigateToHistory, navigateToSettings, navigateToAccount, navigateToMcp, navigateToChat } = useExtensionState()
+	const { navigateToHistory, navigateToSettings, navigateToSpecs, navigateToAccount, navigateToMcp, navigateToChat } =
+		useExtensionState()
 
 	const SETTINGS_TABS = useMemo(
 		() => [
@@ -40,6 +41,13 @@ export const Navbar = () => {
 				navigate: navigateToMcp,
 			},
 			{
+				id: "specs",
+				name: "Specs",
+				tooltip: "Specifications",
+				icon: FileCodeIcon,
+				navigate: navigateToSpecs,
+			},
+			{
 				id: "history",
 				name: "History",
 				tooltip: "History",
@@ -61,7 +69,7 @@ export const Navbar = () => {
 				navigate: navigateToSettings,
 			},
 		],
-		[navigateToAccount, navigateToChat, navigateToHistory, navigateToMcp, navigateToSettings],
+		[navigateToAccount, navigateToChat, navigateToHistory, navigateToSpecs, navigateToMcp, navigateToSettings],
 	)
 
 	return (

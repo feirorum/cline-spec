@@ -6,6 +6,7 @@ import HistoryView from "./components/history/HistoryView"
 import McpView from "./components/mcp/configuration/McpConfigurationView"
 import OnboardingView from "./components/onboarding/OnboardingView"
 import SettingsView from "./components/settings/SettingsView"
+import SpecsView from "./components/specs/SpecsView"
 import { useClineAuth } from "./context/ClineAuthContext"
 import { useExtensionState } from "./context/ExtensionStateContext"
 import { Providers } from "./Providers"
@@ -20,6 +21,7 @@ const AppContent = () => {
 		mcpTab,
 		showSettings,
 		showHistory,
+		showSpecs,
 		showAccount,
 		showAnnouncement,
 		setShowAnnouncement,
@@ -28,6 +30,7 @@ const AppContent = () => {
 		navigateToHistory,
 		hideSettings,
 		hideHistory,
+		hideSpecs,
 		hideAccount,
 		hideAnnouncement,
 	} = useExtensionState()
@@ -61,6 +64,7 @@ const AppContent = () => {
 		<div className="flex h-screen w-full flex-col">
 			{showSettings && <SettingsView onDone={hideSettings} />}
 			{showHistory && <HistoryView onDone={hideHistory} />}
+			{showSpecs && <SpecsView onDone={hideSpecs} />}
 			{showMcp && <McpView initialTab={mcpTab} onDone={closeMcpView} />}
 			{showAccount && (
 				<AccountView
@@ -73,7 +77,7 @@ const AppContent = () => {
 			{/* Do not conditionally load ChatView, it's expensive and there's state we don't want to lose (user input, disableInput, askResponse promise, etc.) */}
 			<ChatView
 				hideAnnouncement={hideAnnouncement}
-				isHidden={showSettings || showHistory || showMcp || showAccount}
+				isHidden={showSettings || showHistory || showSpecs || showMcp || showAccount}
 				showAnnouncement={showAnnouncement}
 				showHistoryView={navigateToHistory}
 			/>
