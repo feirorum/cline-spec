@@ -13,12 +13,13 @@ function convertSpecToProto(spec: Spec): ProtoSpec {
 		format: spec.format,
 		status: spec.status,
 		files: spec.files,
-		tests: spec.tests?.map((t) => ({
-			filePath: t.filePath,
-			framework: t.framework,
-			status: t.status,
-			lastRun: t.lastRun,
-		})),
+		tests:
+			spec.tests?.map((t) => ({
+				filePath: t.filePath,
+				framework: t.framework,
+				status: t.status,
+				lastRun: t.lastRun,
+			})) ?? [],
 		tags: spec.tags,
 		metadata: {
 			createdAt: spec.metadata.createdAt,
@@ -33,13 +34,18 @@ function convertSpecToProto(spec: Spec): ProtoSpec {
 /**
  * Get a single spec by ID
  */
-export async function getSpec(controller: Controller, request: GetSpecRequest): Promise<ProtoSpec | null> {
+export async function getSpec(controller: Controller, request: GetSpecRequest): Promise<ProtoSpec> {
 	try {
 		const specService = controller.getSpecService()
 		const spec = await specService.getSpec(request.specId)
-		return spec ? convertSpecToProto(spec) : null
+
+		if (!spec) {
+			throw new Error(`Spec not found: ${request.specId}`)
+		}
+
+		return convertSpecToProto(spec)
 	} catch (error) {
 		console.error("Error in getSpec:", error)
-		return null
+		throw error
 	}
 }

@@ -53,10 +53,10 @@ service SpecsService {
   rpc subscribeToTriggers(SubscribeToTriggersRequest) returns (stream TriggerEvent);
 
   // Get spec settings
-  rpc getSettings(GetSpecSettingsRequest) returns (SpecSettings);
+  rpc getSpecSettings(GetSpecSettingsRequest) returns (SpecSettings);
 
   // Update spec settings
-  rpc updateSettings(UpdateSpecSettingsRequest) returns (Empty);
+  rpc updateSpecSettings(UpdateSpecSettingsRequest) returns (Empty);
 
   // Get spec statistics
   rpc getStats(GetStatsRequest) returns (SpecStats);

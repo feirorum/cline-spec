@@ -4,7 +4,7 @@ import { Controller } from ".."
 /**
  * Get spec settings
  */
-export async function getSettings(controller: Controller, _request: GetSpecSettingsRequest): Promise<ProtoSpecSettings> {
+export async function getSpecSettings(controller: Controller, _request: GetSpecSettingsRequest): Promise<ProtoSpecSettings> {
 	try {
 		const specService = controller.getSpecService()
 		const settings = await specService.getSettings()

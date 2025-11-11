@@ -13,12 +13,13 @@ function convertSpecToProto(spec: Spec): ProtoSpec {
 		format: spec.format,
 		status: spec.status,
 		files: spec.files,
-		tests: spec.tests?.map((t) => ({
-			filePath: t.filePath,
-			framework: t.framework,
-			status: t.status,
-			lastRun: t.lastRun,
-		})),
+		tests:
+			spec.tests?.map((t) => ({
+				filePath: t.filePath,
+				framework: t.framework,
+				status: t.status,
+				lastRun: t.lastRun,
+			})) ?? [],
 		tags: spec.tags,
 		metadata: {
 			createdAt: spec.metadata.createdAt,

@@ -22,14 +22,14 @@ export async function generateSpec(
 		// 3. Format according to spec format (Gherkin, user stories, etc.)
 
 		await responseStream({
-			chunk: "# Spec generation not yet implemented\n",
-			done: false,
+			content: "# Spec generation not yet implemented\n",
+			isComplete: false,
 		})
 
 		await responseStream(
 			{
-				chunk: "This feature will be available in Phase 6.\n",
-				done: true,
+				content: "This feature will be available in Phase 6.\n",
+				isComplete: true,
 			},
 			true,
 		)
@@ -37,8 +37,8 @@ export async function generateSpec(
 		console.error("Error in generateSpec:", error)
 		await responseStream(
 			{
-				chunk: error instanceof Error ? error.message : String(error),
-				done: true,
+				content: error instanceof Error ? error.message : String(error),
+				isComplete: true,
 			},
 			true,
 		)

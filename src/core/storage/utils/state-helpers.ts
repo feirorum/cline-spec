@@ -485,6 +485,7 @@ export async function readGlobalStateFromDisk(context: ExtensionContext): Promis
 		const multiRootEnabled = context.globalState.get<GlobalStateAndSettings["multiRootEnabled"]>("multiRootEnabled")
 		const nativeToolCallEnabled =
 			context.globalState.get<GlobalStateAndSettings["nativeToolCallEnabled"]>("nativeToolCallEnabled")
+		const specs = context.globalState.get<GlobalStateAndSettings["specs"]>("specs")
 
 		return {
 			// api configuration fields
@@ -653,6 +654,9 @@ export async function readGlobalStateFromDisk(context: ExtensionContext): Promis
 			// Feature flag - defaults to false
 			// For now, always return false to disable multi-root support by default
 			multiRootEnabled: !!multiRootEnabled,
+
+			// Progressive Spec feature
+			specs,
 
 			// OpenTelemetry configuration
 			openTelemetryEnabled: openTelemetryEnabled ?? true,

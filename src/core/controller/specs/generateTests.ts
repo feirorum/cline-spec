@@ -23,14 +23,20 @@ export async function generateTests(
 		// 4. Stream test code generation
 
 		await responseStream({
-			chunk: "// Test generation not yet implemented\n",
-			done: false,
+			framework: "jest",
+			filePath: "",
+			content: "// Test generation not yet implemented\n",
+			runCommand: "",
+			isComplete: false,
 		})
 
 		await responseStream(
 			{
-				chunk: "// This feature will be available in Phase 7.\n",
-				done: true,
+				framework: "jest",
+				filePath: "",
+				content: "// This feature will be available in Phase 7.\n",
+				runCommand: "",
+				isComplete: true,
 			},
 			true,
 		)
@@ -38,8 +44,11 @@ export async function generateTests(
 		console.error("Error in generateTests:", error)
 		await responseStream(
 			{
-				chunk: error instanceof Error ? error.message : String(error),
-				done: true,
+				framework: "jest",
+				filePath: "",
+				content: error instanceof Error ? error.message : String(error),
+				runCommand: "",
+				isComplete: true,
 			},
 			true,
 		)

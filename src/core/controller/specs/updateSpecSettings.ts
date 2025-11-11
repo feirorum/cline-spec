@@ -6,7 +6,7 @@ import { Controller } from ".."
 /**
  * Update spec settings
  */
-export async function updateSettings(controller: Controller, request: UpdateSpecSettingsRequest): Promise<Empty> {
+export async function updateSpecSettings(controller: Controller, request: UpdateSpecSettingsRequest): Promise<Empty> {
 	try {
 		const specService = controller.getSpecService()
 
