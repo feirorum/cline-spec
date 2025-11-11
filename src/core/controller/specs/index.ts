@@ -5,36 +5,36 @@
  * Each handler follows the pattern: (controller, request) => Promise<response>
  */
 
-import { Controller } from ".."
+import { Empty, Int64, String as ProtoString } from "@shared/proto/cline/common"
 import {
-	GetSpecsRequest,
-	GetSpecsResponse,
-	GetSpecRequest,
 	AddSpecRequest,
-	UpdateSpecRequest,
+	CreateManualTriggerRequest,
 	DeleteSpecRequest,
-	SearchSpecsRequest,
-	ExtractRequirementsRequest,
-	ExtractRequirementsResponse,
 	DetectTriggersRequest,
 	DetectTriggersResponse,
-	CreateManualTriggerRequest,
 	DismissTriggerRequest,
+	ExportSpecsRequest,
+	ExtractRequirementsRequest,
+	ExtractRequirementsResponse,
+	GetSpecRequest,
+	GetSpecSettingsRequest,
+	GetSpecsRequest,
+	GetSpecsResponse,
+	GetStatsRequest,
 	GetTriggersRequest,
 	GetTriggersResponse,
-	GetSettingsRequest,
-	UpdateSettingsRequest,
-	GetStatsRequest,
-	ExportSpecsRequest,
 	ImportSpecsRequest,
+	Requirement as ProtoRequirement,
 	Spec as ProtoSpec,
-	Trigger as ProtoTrigger,
 	SpecSettings as ProtoSpecSettings,
 	SpecStats as ProtoSpecStats,
-	Requirement as ProtoRequirement,
+	Trigger as ProtoTrigger,
+	SearchSpecsRequest,
+	UpdateSpecRequest,
+	UpdateSpecSettingsRequest,
 } from "@shared/proto/cline/specs"
-import { Empty, String as ProtoString, Int64 } from "@shared/proto/cline/common"
-import { Spec, Trigger, SpecSettings, Requirement } from "@/services/specs/types"
+import { Requirement, Spec, SpecSettings, Trigger } from "@/services/specs/types"
+import { Controller } from ".."
 
 // ============================================================================
 // Conversion Utilities
@@ -106,7 +106,7 @@ export async function getSpecs(controller: Controller, request: GetSpecsRequest)
 	try {
 		const specService = controller.getSpecService()
 
-		let filter
+		let filter: SpecFilter | undefined
 		if (request.filter) {
 			filter = {
 				status: request.filter.status as any,
@@ -169,12 +169,24 @@ export async function updateSpec(controller: Controller, request: UpdateSpecRequ
 		const specService = controller.getSpecService()
 
 		const updates: any = {}
-		if (request.title) updates.title = request.title
-		if (request.content) updates.content = request.content
-		if (request.format) updates.format = request.format
-		if (request.status) updates.status = request.status
-		if (request.files) updates.files = request.files
-		if (request.tags) updates.tags = request.tags
+		if (request.title) {
+			updates.title = request.title
+		}
+		if (request.content) {
+			updates.content = request.content
+		}
+		if (request.format) {
+			updates.format = request.format
+		}
+		if (request.status) {
+			updates.status = request.status
+		}
+		if (request.files) {
+			updates.files = request.files
+		}
+		if (request.tags) {
+			updates.tags = request.tags
+		}
 
 		const spec = await specService.updateSpec(request.specId, updates)
 		return convertSpecToProto(spec)
@@ -228,10 +240,7 @@ export async function extractRequirements(
 // Trigger Handlers
 // ============================================================================
 
-export async function detectTriggers(
-	controller: Controller,
-	request: DetectTriggersRequest,
-): Promise<DetectTriggersResponse> {
+export async function detectTriggers(controller: Controller, request: DetectTriggersRequest): Promise<DetectTriggersResponse> {
 	try {
 		const specService = controller.getSpecService()
 
@@ -255,10 +264,7 @@ export async function detectTriggers(
 	}
 }
 
-export async function createManualTrigger(
-	controller: Controller,
-	request: CreateManualTriggerRequest,
-): Promise<ProtoTrigger> {
+export async function createManualTrigger(controller: Controller, request: CreateManualTriggerRequest): Promise<ProtoTrigger> {
 	try {
 		const specService = controller.getSpecService()
 
@@ -292,7 +298,7 @@ export async function dismissTrigger(controller: Controller, request: DismissTri
 	}
 }
 
-export async function getTriggers(controller: Controller, request: GetTriggersRequest): Promise<GetTriggersResponse> {
+export async function getTriggers(controller: Controller, _request: GetTriggersRequest): Promise<GetTriggersResponse> {
 	try {
 		const specService = controller.getSpecService()
 		const triggers = await specService.getTriggers()
@@ -307,7 +313,7 @@ export async function getTriggers(controller: Controller, request: GetTriggersRe
 // Settings Handlers
 // ============================================================================
 
-export async function getSettings(controller: Controller, request: GetSettingsRequest): Promise<ProtoSpecSettings> {
+export async function getSettings(controller: Controller, _request: GetSpecSettingsRequest): Promise<ProtoSpecSettings> {
 	try {
 		const specService = controller.getSpecService()
 		const settings = await specService.getSettings()
@@ -333,18 +339,27 @@ export async function getSettings(controller: Controller, request: GetSettingsRe
 	}
 }
 
-export async function updateSettings(controller: Controller, request: UpdateSettingsRequest): Promise<Empty> {
+export async function updateSettings(controller: Controller, request: UpdateSpecSettingsRequest): Promise<Empty> {
 	try {
 		const specService = controller.getSpecService()
 
 		const updates: Partial<SpecSettings> = {}
 		if (request.settings) {
-			if (request.settings.enabled !== undefined) updates.enabled = request.settings.enabled
-			if (request.settings.autoDetectTriggers !== undefined)
+			if (request.settings.enabled !== undefined) {
+				updates.enabled = request.settings.enabled
+			}
+			if (request.settings.autoDetectTriggers !== undefined) {
 				updates.autoDetectTriggers = request.settings.autoDetectTriggers
-			if (request.settings.defaultFormat) updates.defaultFormat = request.settings.defaultFormat as any
-			if (request.settings.storageMode) updates.storageMode = request.settings.storageMode as any
-			if (request.settings.specDirectory) updates.specDirectory = request.settings.specDirectory
+			}
+			if (request.settings.defaultFormat) {
+				updates.defaultFormat = request.settings.defaultFormat as any
+			}
+			if (request.settings.storageMode) {
+				updates.storageMode = request.settings.storageMode as any
+			}
+			if (request.settings.specDirectory) {
+				updates.specDirectory = request.settings.specDirectory
+			}
 			if (request.settings.triggerConfig) {
 				updates.triggerConfig = {
 					maxLinesPerFile: request.settings.triggerConfig.maxLinesPerFile,
@@ -369,7 +384,7 @@ export async function updateSettings(controller: Controller, request: UpdateSett
 // Stats and Export Handlers
 // ============================================================================
 
-export async function getStats(controller: Controller, request: GetStatsRequest): Promise<ProtoSpecStats> {
+export async function getStats(controller: Controller, _request: GetStatsRequest): Promise<ProtoSpecStats> {
 	try {
 		const specService = controller.getSpecService()
 		const stats = await specService.getStats()
@@ -393,7 +408,7 @@ export async function getStats(controller: Controller, request: GetStatsRequest)
 	}
 }
 
-export async function exportSpecs(controller: Controller, request: ExportSpecsRequest): Promise<ProtoString> {
+export async function exportSpecs(controller: Controller, _request: ExportSpecsRequest): Promise<ProtoString> {
 	try {
 		const specService = controller.getSpecService()
 		const json = await specService.exportSpecs()

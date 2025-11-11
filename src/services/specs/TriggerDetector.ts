@@ -5,8 +5,8 @@
  * or other factors indicate that creating a spec would be valuable.
  */
 
-import { Trigger, TriggerConfig, TriggerType, TaskContext, DEFAULT_TRIGGER_CONFIG } from "./types"
-import { SpecTracker, TrackedMessage } from "./SpecTracker"
+import { SpecTracker } from "./SpecTracker"
+import { DEFAULT_TRIGGER_CONFIG, TaskContext, Trigger, TriggerConfig } from "./types"
 
 /**
  * TriggerDetector identifies when to suggest spec formalization
@@ -77,7 +77,7 @@ export class TriggerDetector {
 	/**
 	 * Check complexity of a single file
 	 */
-	private checkFileComplexity(file: string, context: TaskContext): Trigger | null {
+	private checkFileComplexity(_file: string, _context: TaskContext): Trigger | null {
 		// In a real implementation, we would read the file and analyze it
 		// For MVP, we'll use a simple heuristic based on file path
 

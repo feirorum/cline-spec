@@ -1,10 +1,10 @@
+import { GetSpecSettingsRequest, SpecSettings as ProtoSpecSettings } from "@shared/proto/cline/specs"
 import { Controller } from ".."
-import { GetSettingsRequest, SpecSettings as ProtoSpecSettings } from "@shared/proto/cline/specs"
 
 /**
  * Get spec settings
  */
-export async function getSettings(controller: Controller, request: GetSettingsRequest): Promise<ProtoSpecSettings> {
+export async function getSettings(controller: Controller, _request: GetSpecSettingsRequest): Promise<ProtoSpecSettings> {
 	try {
 		const specService = controller.getSpecService()
 		const settings = await specService.getSettings()

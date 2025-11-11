@@ -1,10 +1,11 @@
+import { String as ProtoString } from "@shared/proto/cline/common"
+import { ExportSpecsRequest } from "@shared/proto/cline/specs"
 import { Controller } from ".."
-import { ExportSpecsRequest, String as ProtoString } from "@shared/proto/cline/common"
 
 /**
  * Export specs as JSON
  */
-export async function exportSpecs(controller: Controller, request: ExportSpecsRequest): Promise<ProtoString> {
+export async function exportSpecs(controller: Controller, _request: ExportSpecsRequest): Promise<ProtoString> {
 	try {
 		const specService = controller.getSpecService()
 		const json = await specService.exportSpecs()

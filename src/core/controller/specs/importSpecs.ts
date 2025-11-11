@@ -1,5 +1,6 @@
+import { Int64 } from "@shared/proto/cline/common"
+import { ImportSpecsRequest } from "@shared/proto/cline/specs"
 import { Controller } from ".."
-import { ImportSpecsRequest, Int64 } from "@shared/proto/cline/common"
 
 /**
  * Import specs from JSON

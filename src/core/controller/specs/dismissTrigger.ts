@@ -1,5 +1,6 @@
+import { Empty } from "@shared/proto/cline/common"
+import { DismissTriggerRequest } from "@shared/proto/cline/specs"
 import { Controller } from ".."
-import { DismissTriggerRequest, Empty } from "@shared/proto/cline/common"
 
 /**
  * Dismiss a trigger

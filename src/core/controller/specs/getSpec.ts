@@ -1,6 +1,6 @@
-import { Controller } from ".."
 import { GetSpecRequest, Spec as ProtoSpec } from "@shared/proto/cline/specs"
 import { Spec } from "@/services/specs/types"
+import { Controller } from ".."
 
 /**
  * Convert internal Spec to proto Spec

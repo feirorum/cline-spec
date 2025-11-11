@@ -5,7 +5,7 @@
  * then analyzes them to extract implicit requirements using keyword-based heuristics.
  */
 
-import { Requirement, FileChange, ConversationAnalysis, Contradiction, RequirementSource } from "./types"
+import { Contradiction, ConversationAnalysis, FileChange, Requirement } from "./types"
 
 /**
  * Message structure for tracking
@@ -187,9 +187,7 @@ export class SpecTracker {
 					for (const sentence of sentences) {
 						if (pattern.test(sentence)) {
 							// Check if we already have this requirement
-							const isDuplicate = requirements.some(
-								(r) => r.text.toLowerCase() === sentence.toLowerCase(),
-							)
+							const isDuplicate = requirements.some((r) => r.text.toLowerCase() === sentence.toLowerCase())
 
 							if (!isDuplicate && sentence.length > 10 && sentence.length < 500) {
 								requirements.push({
@@ -262,10 +260,7 @@ export class SpecTracker {
 	/**
 	 * Build file reference map from conversation
 	 */
-	private buildFileReferenceMap(
-		messages: TrackedMessage[],
-		fileChanges: Map<string, FileChange[]>,
-	): Map<string, number> {
+	private buildFileReferenceMap(messages: TrackedMessage[], fileChanges: Map<string, FileChange[]>): Map<string, number> {
 		const fileReferences = new Map<string, number>()
 
 		// Count mentions in messages
@@ -382,7 +377,7 @@ export class SpecTracker {
 			return []
 		}
 
-		return this.messageHistory.get(taskId) || []
+		return this.messageHistory.get(targetTaskId) || []
 	}
 
 	// ============================================================================

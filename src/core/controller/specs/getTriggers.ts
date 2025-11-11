@@ -1,6 +1,6 @@
-import { Controller } from ".."
 import { GetTriggersRequest, GetTriggersResponse, Trigger as ProtoTrigger } from "@shared/proto/cline/specs"
 import { Trigger } from "@/services/specs/types"
+import { Controller } from ".."
 
 /**
  * Convert internal Trigger to proto Trigger
@@ -30,7 +30,7 @@ function convertTriggerToProto(trigger: Trigger): ProtoTrigger {
 /**
  * Get all triggers
  */
-export async function getTriggers(controller: Controller, request: GetTriggersRequest): Promise<GetTriggersResponse> {
+export async function getTriggers(controller: Controller, _request: GetTriggersRequest): Promise<GetTriggersResponse> {
 	try {
 		const specService = controller.getSpecService()
 		const triggers = await specService.getTriggers()

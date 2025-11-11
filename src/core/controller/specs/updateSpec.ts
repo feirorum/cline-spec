@@ -1,6 +1,6 @@
-import { Controller } from ".."
-import { UpdateSpecRequest, Spec as ProtoSpec } from "@shared/proto/cline/specs"
+import { Spec as ProtoSpec, UpdateSpecRequest } from "@shared/proto/cline/specs"
 import { Spec } from "@/services/specs/types"
+import { Controller } from ".."
 
 /**
  * Convert internal Spec to proto Spec
@@ -38,12 +38,24 @@ export async function updateSpec(controller: Controller, request: UpdateSpecRequ
 		const specService = controller.getSpecService()
 
 		const updates: any = {}
-		if (request.title) updates.title = request.title
-		if (request.content) updates.content = request.content
-		if (request.format) updates.format = request.format
-		if (request.status) updates.status = request.status
-		if (request.files) updates.files = request.files
-		if (request.tags) updates.tags = request.tags
+		if (request.title) {
+			updates.title = request.title
+		}
+		if (request.content) {
+			updates.content = request.content
+		}
+		if (request.format) {
+			updates.format = request.format
+		}
+		if (request.status) {
+			updates.status = request.status
+		}
+		if (request.files) {
+			updates.files = request.files
+		}
+		if (request.tags) {
+			updates.tags = request.tags
+		}
 
 		const spec = await specService.updateSpec(request.specId, updates)
 		return convertSpecToProto(spec)

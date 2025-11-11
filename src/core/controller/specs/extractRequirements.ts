@@ -1,10 +1,10 @@
-import { Controller } from ".."
 import {
 	ExtractRequirementsRequest,
 	ExtractRequirementsResponse,
 	Requirement as ProtoRequirement,
 } from "@shared/proto/cline/specs"
 import { Requirement } from "@/services/specs/types"
+import { Controller } from ".."
 
 /**
  * Convert internal Requirement to proto Requirement

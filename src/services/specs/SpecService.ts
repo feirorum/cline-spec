@@ -10,16 +10,16 @@ import { SpecStorage } from "./SpecStorage"
 import { SpecTracker, TrackedMessage } from "./SpecTracker"
 import { TriggerDetector } from "./TriggerDetector"
 import {
+	FileChange,
+	GeneratedTest,
+	GenerationContext,
+	Requirement,
 	Spec,
 	SpecFilter,
-	Requirement,
-	Trigger,
-	TaskContext,
 	SpecFormat,
-	GenerationContext,
-	GeneratedTest,
-	FileChange,
 	SpecSettings,
+	TaskContext,
+	Trigger,
 } from "./types"
 
 /**
@@ -125,12 +125,14 @@ export class SpecService {
 		this.ensureInitialized()
 
 		// Ensure updated timestamp is set
-		const updatesWithTimestamp = {
+		const updatesWithTimestamp: Partial<Spec> = {
 			...updates,
-			metadata: {
-				...updates.metadata,
-				updatedAt: Date.now(),
-			},
+			metadata: updates.metadata
+				? {
+						...updates.metadata,
+						updatedAt: Date.now(),
+					}
+				: undefined,
 		}
 
 		await this.storage.updateSpec(id, updatesWithTimestamp)
@@ -214,7 +216,7 @@ export class SpecService {
 	 * Get tracked conversation messages
 	 */
 	getTrackedMessages(taskId?: string): TrackedMessage[] {
-		const targetTaskId = taskId || this.currentTaskId
+		const targetTaskId = taskId || this.currentTaskId || undefined
 		return this.tracker.getMessageHistory(targetTaskId)
 	}
 
@@ -222,7 +224,7 @@ export class SpecService {
 	 * Get file modification count
 	 */
 	getFileModificationCount(file: string, taskId?: string): number {
-		const targetTaskId = taskId || this.currentTaskId
+		const targetTaskId = taskId || this.currentTaskId || undefined
 		return this.tracker.getFileModificationCount(file, targetTaskId)
 	}
 
@@ -230,7 +232,7 @@ export class SpecService {
 	 * Get all tracked files
 	 */
 	getTrackedFiles(taskId?: string): string[] {
-		const targetTaskId = taskId || this.currentTaskId
+		const targetTaskId = taskId || this.currentTaskId || undefined
 		return this.tracker.getTrackedFiles(targetTaskId)
 	}
 
@@ -278,11 +280,7 @@ export class SpecService {
 	 * TODO: Implement full generation logic with LLM
 	 * For now, returns placeholder content
 	 */
-	async generateSpec(
-		requirements: Requirement[],
-		format: SpecFormat,
-		context?: GenerationContext,
-	): Promise<string> {
+	async generateSpec(_requirements: Requirement[], format: SpecFormat, _context?: GenerationContext): Promise<string> {
 		this.ensureInitialized()
 
 		// TODO: Implement spec generation using LLM
@@ -296,7 +294,7 @@ export class SpecService {
 	/**
 	 * Improve an existing spec based on feedback
 	 */
-	async improveSpec(existingSpec: string, feedback: string): Promise<string> {
+	async improveSpec(existingSpec: string, _feedback: string): Promise<string> {
 		this.ensureInitialized()
 
 		// TODO: Implement spec improvement with LLM

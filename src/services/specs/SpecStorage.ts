@@ -6,15 +6,7 @@
  */
 
 import { StateManager } from "@/core/storage/StateManager"
-import {
-	Spec,
-	SpecFilter,
-	SpecsState,
-	WorkspaceSpecs,
-	Trigger,
-	SpecSettings,
-	DEFAULT_SPEC_SETTINGS,
-} from "./types"
+import { DEFAULT_SPEC_SETTINGS, Spec, SpecFilter, SpecSettings, SpecsState, Trigger, WorkspaceSpecs } from "./types"
 
 export class SpecStorage {
 	private stateManager: StateManager
@@ -37,7 +29,7 @@ export class SpecStorage {
 	 */
 	async initialize(): Promise<void> {
 		// Load specs from StateManager (if they exist)
-		const storedSpecs = this.stateManager.getGlobalState("specs" as any)
+		const storedSpecs = this.stateManager.getGlobalStateKey("specs" as any)
 
 		if (storedSpecs) {
 			this.cache = storedSpecs as SpecsState
@@ -95,12 +87,16 @@ export class SpecStorage {
 	async getSpec(id: string): Promise<Spec | null> {
 		// Check global specs
 		const globalSpec = this.cache.global.find((s) => s.id === id)
-		if (globalSpec) return globalSpec
+		if (globalSpec) {
+			return globalSpec
+		}
 
 		// Check all workspaces
 		for (const workspace of Object.values(this.cache.workspaces)) {
 			const spec = workspace.specs.find((s) => s.id === id)
-			if (spec) return spec
+			if (spec) {
+				return spec
+			}
 		}
 
 		return null
@@ -285,9 +281,7 @@ export class SpecStorage {
 		const workspaceSpecs = this.getWorkspaceSpecs(wsId)
 		const now = Date.now()
 
-		workspaceSpecs.triggers = workspaceSpecs.triggers.filter(
-			(t) => !t.dismissed || now - t.timestamp < maxAgeMs,
-		)
+		workspaceSpecs.triggers = workspaceSpecs.triggers.filter((t) => !t.dismissed || now - t.timestamp < maxAgeMs)
 
 		await this.persist()
 	}

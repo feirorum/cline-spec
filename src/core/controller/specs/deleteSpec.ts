@@ -1,5 +1,6 @@
+import { Empty } from "@shared/proto/cline/common"
+import { DeleteSpecRequest } from "@shared/proto/cline/specs"
 import { Controller } from ".."
-import { DeleteSpecRequest, Empty } from "@shared/proto/cline/common"
 
 /**
  * Delete a spec

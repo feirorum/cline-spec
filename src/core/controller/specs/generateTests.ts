@@ -1,6 +1,6 @@
-import { Controller } from ".."
-import { GenerateTestsRequest, GenerateTestsChunk } from "@shared/proto/cline/specs"
+import { GenerateTestsChunk, GenerateTestsRequest } from "@shared/proto/cline/specs"
 import { StreamingResponseHandler } from "@/core/controller/grpc-handler"
+import { Controller } from ".."
 
 /**
  * Generate tests from spec (streaming)
@@ -9,10 +9,10 @@ import { StreamingResponseHandler } from "@/core/controller/grpc-handler"
  * This will detect test frameworks and generate appropriate tests
  */
 export async function generateTests(
-	controller: Controller,
-	request: GenerateTestsRequest,
+	_controller: Controller,
+	_request: GenerateTestsRequest,
 	responseStream: StreamingResponseHandler<GenerateTestsChunk>,
-	requestId?: string,
+	_requestId?: string,
 ): Promise<void> {
 	try {
 		// Placeholder implementation
@@ -22,17 +22,26 @@ export async function generateTests(
 		// 3. Determine test file location
 		// 4. Stream test code generation
 
-		responseStream.write({
+		await responseStream({
 			chunk: "// Test generation not yet implemented\n",
 			done: false,
 		})
 
-		responseStream.write({
-			chunk: "// This feature will be available in Phase 7.\n",
-			done: true,
-		})
+		await responseStream(
+			{
+				chunk: "// This feature will be available in Phase 7.\n",
+				done: true,
+			},
+			true,
+		)
 	} catch (error) {
 		console.error("Error in generateTests:", error)
-		responseStream.error(error instanceof Error ? error : new Error(String(error)))
+		await responseStream(
+			{
+				chunk: error instanceof Error ? error.message : String(error),
+				done: true,
+			},
+			true,
+		)
 	}
 }

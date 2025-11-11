@@ -1,10 +1,10 @@
-import { Controller } from ".."
 import { GetStatsRequest, SpecStats as ProtoSpecStats } from "@shared/proto/cline/specs"
+import { Controller } from ".."
 
 /**
  * Get spec statistics
  */
-export async function getStats(controller: Controller, request: GetStatsRequest): Promise<ProtoSpecStats> {
+export async function getStats(controller: Controller, _request: GetStatsRequest): Promise<ProtoSpecStats> {
 	try {
 		const specService = controller.getSpecService()
 		const stats = await specService.getStats()

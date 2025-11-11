@@ -1,6 +1,6 @@
-import { Controller } from ".."
-import { GenerateSpecRequest, GenerateSpecChunk } from "@shared/proto/cline/specs"
+import { GenerateSpecChunk, GenerateSpecRequest } from "@shared/proto/cline/specs"
 import { StreamingResponseHandler } from "@/core/controller/grpc-handler"
+import { Controller } from ".."
 
 /**
  * Generate spec from requirements (streaming)
@@ -9,10 +9,10 @@ import { StreamingResponseHandler } from "@/core/controller/grpc-handler"
  * This will use Cline's ApiHandler to generate specs in real-time
  */
 export async function generateSpec(
-	controller: Controller,
-	request: GenerateSpecRequest,
+	_controller: Controller,
+	_request: GenerateSpecRequest,
 	responseStream: StreamingResponseHandler<GenerateSpecChunk>,
-	requestId?: string,
+	_requestId?: string,
 ): Promise<void> {
 	try {
 		// Placeholder implementation
@@ -21,17 +21,26 @@ export async function generateSpec(
 		// 2. Stream LLM responses
 		// 3. Format according to spec format (Gherkin, user stories, etc.)
 
-		responseStream.write({
+		await responseStream({
 			chunk: "# Spec generation not yet implemented\n",
 			done: false,
 		})
 
-		responseStream.write({
-			chunk: "This feature will be available in Phase 6.\n",
-			done: true,
-		})
+		await responseStream(
+			{
+				chunk: "This feature will be available in Phase 6.\n",
+				done: true,
+			},
+			true,
+		)
 	} catch (error) {
 		console.error("Error in generateSpec:", error)
-		responseStream.error(error instanceof Error ? error : new Error(String(error)))
+		await responseStream(
+			{
+				chunk: error instanceof Error ? error.message : String(error),
+				done: true,
+			},
+			true,
+		)
 	}
 }

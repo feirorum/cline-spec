@@ -1,6 +1,6 @@
-import { Controller } from ".."
 import { CreateManualTriggerRequest, Trigger as ProtoTrigger } from "@shared/proto/cline/specs"
 import { Trigger } from "@/services/specs/types"
+import { Controller } from ".."
 
 /**
  * Convert internal Trigger to proto Trigger
@@ -30,10 +30,7 @@ function convertTriggerToProto(trigger: Trigger): ProtoTrigger {
 /**
  * Create manual trigger
  */
-export async function createManualTrigger(
-	controller: Controller,
-	request: CreateManualTriggerRequest,
-): Promise<ProtoTrigger> {
+export async function createManualTrigger(controller: Controller, request: CreateManualTriggerRequest): Promise<ProtoTrigger> {
 	try {
 		const specService = controller.getSpecService()
 

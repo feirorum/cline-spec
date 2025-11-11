@@ -9,7 +9,7 @@ option java_multiple_files = true;
 option java_package = "bot.cline.proto";
 
 // Service for Progressive Spec feature - spec-driven development with gradual formalization
-service SpecService {
+service SpecsService {
   // Get all specs with optional filtering
   rpc getSpecs(GetSpecsRequest) returns (GetSpecsResponse);
 
@@ -53,10 +53,10 @@ service SpecService {
   rpc subscribeToTriggers(SubscribeToTriggersRequest) returns (stream TriggerEvent);
 
   // Get spec settings
-  rpc getSettings(GetSettingsRequest) returns (SpecSettings);
+  rpc getSettings(GetSpecSettingsRequest) returns (SpecSettings);
 
   // Update spec settings
-  rpc updateSettings(UpdateSettingsRequest) returns (Empty);
+  rpc updateSettings(UpdateSpecSettingsRequest) returns (Empty);
 
   // Get spec statistics
   rpc getStats(GetStatsRequest) returns (SpecStats);
@@ -350,13 +350,13 @@ message TriggerEvent {
 }
 
 // Get settings request
-message GetSettingsRequest {
+message GetSpecSettingsRequest {
   Metadata metadata = 1;
   optional string workspace_id = 2;
 }
 
 // Update settings request
-message UpdateSettingsRequest {
+message UpdateSpecSettingsRequest {
   Metadata metadata = 1;
   SpecSettings settings = 2;
 }
