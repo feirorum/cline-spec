@@ -33,6 +33,7 @@ import { LogoutReason } from "@/services/auth/types"
 import { featureFlagsService } from "@/services/feature-flags"
 import { getDistinctId } from "@/services/logging/distinctId"
 import { telemetryService } from "@/services/telemetry"
+import { SpecService } from "@/services/specs"
 import { getAxiosSettings } from "@/shared/net"
 import { ShowMessageType } from "@/shared/proto/host/window"
 import { AuthState } from "@/shared/proto/index.cline"
@@ -70,6 +71,7 @@ export class Controller {
 	authService: AuthService
 	ocaAuthService: OcaAuthService
 	readonly stateManager: StateManager
+	private specService: SpecService
 
 	// NEW: Add workspace manager (optional initially)
 	private workspaceManager?: WorkspaceRootManager
@@ -106,6 +108,13 @@ export class Controller {
 	// Synchronous getter for workspace manager
 	getWorkspaceManager(): WorkspaceRootManager | undefined {
 		return this.workspaceManager
+	}
+
+	/**
+	 * Get the spec service instance
+	 */
+	getSpecService(): SpecService {
+		return this.specService
 	}
 
 	/**
@@ -167,6 +176,12 @@ export class Controller {
 			telemetryService,
 		)
 
+		// Initialize SpecService for progressive spec tracking
+		this.specService = new SpecService(this.stateManager)
+		this.specService.initialize().catch((error) => {
+			console.error("[Controller] Failed to initialize SpecService:", error)
+		})
+
 		// Clean up legacy checkpoints
 		cleanupLegacyCheckpoints().catch((error) => {
 			console.error("Failed to cleanup legacy checkpoints:", error)
@@ -186,6 +201,11 @@ export class Controller {
 		if (this.remoteConfigTimer) {
 			clearInterval(this.remoteConfigTimer)
 			this.remoteConfigTimer = undefined
+		}
+
+		// Stop spec tracking if there's an active task
+		if (this.task?.taskId) {
+			this.specService.stopTracking(this.task.taskId)
 		}
 
 		await this.clearTask()
@@ -342,6 +362,9 @@ export class Controller {
 		} else if (task || images || files) {
 			this.task.startTask(task, images, files)
 		}
+
+		// Start spec tracking for this task
+		this.specService.startTracking(taskId)
 
 		return this.task.taskId
 	}
@@ -972,6 +995,27 @@ export class Controller {
 
 	async clearTask() {
 		if (this.task) {
+			// Detect triggers before clearing task
+			try {
+				const modifiedFiles = this.specService.getTrackedFiles(this.task.taskId)
+				const conversation = this.specService.getTrackedMessages(this.task.taskId)
+
+				await this.specService.detectTriggers({
+					taskId: this.task.taskId,
+					modifiedFiles,
+					conversation: conversation.map((m) => ({
+						id: m.id,
+						role: m.role,
+						content: m.content,
+					})),
+				})
+			} catch (error) {
+				console.error("[Controller] Failed to detect spec triggers:", error)
+			}
+
+			// Stop spec tracking
+			this.specService.stopTracking(this.task.taskId)
+
 			// Clear task settings cache when task ends
 			await this.stateManager.clearTaskSettings()
 		}
